@@ -145,6 +145,31 @@ class WindowDocumentAuxVarsTest extends SeleniumDetectionTest {
 }
 
 /**
+ * Detects CDP Runtime Domain enabled.
+ * 
+ * see https://source.chromium.org/chromium/chromium/src/+/main:v8/src/inspector/v8-runtime-agent-impl.cc;l=992
+ */
+class CDPRuntimeDomainTest extends SeleniumDetectionTest {
+
+    test(window) {
+        let trapped = false;
+        const e = new Error();
+        window.Object.defineProperty(e, 'stack', {
+            configurable: false,
+            enumerable: false,
+            get: function() {
+                trapped = true;
+                return '';
+            }
+        });
+        window.console.debug(e);
+        return trapped;
+    }
+
+}
+
+
+/**
  * see https://source.chromium.org/chromium/chromium/src/+/main:chrome/test/chromedriver/js/execute_script.js;l=13
  * https://source.chromium.org/chromium/chromium/src/+/main:chrome/test/chromedriver/js/call_function.js;l=426
  */
@@ -257,6 +282,10 @@ function displayDetectionResult(detections, isPartial=false) {
         new WindowConstructorAliasTest(
             'window-constructors-alias-iframe',
             '<pre>cdc_..._Array</pre>, <pre>cdc_..._Promise</pre> and <pre>cdc_..._Symbol</pre> vars on Window from an iframe'
+        ),
+        new CDPRuntimeDomainTest(
+            'devtools-console',
+            'Either Devtools Console is open or CDP Runtime Domain is enabled'
         )
     ];
     const activeTests = [
