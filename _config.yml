@@ -1,1 +1,1 @@
-exclude: ['**/requirements.txt', '*.py', '.*']
+exclude: ['*/requirements.txt', '*/README.md', '*.py', '.*']
