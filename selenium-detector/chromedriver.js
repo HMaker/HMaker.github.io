@@ -28,6 +28,10 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const Document_querySelector = Document.prototype.querySelector;
+const Document_querySelectorAll = Document.prototype.querySelectorAll;
+
+
 class SeleniumDetectionTest {
 
     constructor(name, desc) {
@@ -102,7 +106,7 @@ class WindowConstructorAliasTest extends SeleniumDetectionTest {
         // window.Array, window.Promise and window.Symbol.
         function hasConstructorAlias(window, constructor) {
             for (const prop of window.Object.getOwnPropertyNames(window)) {
-                if (prop == constructor.name) continue;
+                if (prop == constructor.name || prop == 'token' || prop == 'getAsyncToken') continue;
                 if (window[prop] === constructor) return true;
             }
             return false;
@@ -134,7 +138,7 @@ class WindowDocumentAuxVarsTest extends SeleniumDetectionTest {
             const expectedProto = ['storeItem', 'retrieveItem', 'isNodeReachable_']
             proto.sort()
             expectedProto.sort()
-            if (proto == expectedProto) return true;
+            if (proto.every((prop, i) => prop == expectedProto[i])) return true;
         }
         return false;
     }
@@ -198,13 +202,41 @@ class ExecuteAsyncScriptTest extends JSCallStackTest {
 }
 
 
+/**
+ * @param {Array.<SeleniumDetectionTest>} detections 
+ */
+function displayDetectionResult(detections, isPartial=false) {
+    if (detections.length > 0) {
+        const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
+        status.textContent = 'Detected!';
+        status.classList.remove('test-status-passed');
+        status.classList.remove('test-status-partially-passed');
+        status.classList.add('test-status-detected');
+        Document_querySelector.call(document, '#chromedriver-test-container .modal-content').innerHTML = detections.map(
+            thetest => thetest.getDescriptionHTML()
+        ).join('');
+        const testResult = Document_querySelector.call(document, '#chromedriver-test-container .test-result');
+        testResult.textContent = `${detections.length} detections`;
+        testResult.onclick = function() {
+            Document_querySelector.call(document, '#chromedriver-test-container .modal-container').classList.add('modal-visible');
+        }
+    } else {
+        const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
+        if (isPartial) {
+            status.textContent = 'Passing...';
+            status.classList.remove('test-status-detected');
+            status.classList.add('test-status-partially-passed');
+        } else {
+            status.textContent = 'Passed!';
+            status.classList.remove('test-status-detected');
+            status.classList.remove('test-status-partially-passed');
+            status.classList.add('test-status-passed');
+        }
+    }
+}
+
+
 (function() {
-    const Document_querySelector = Document.prototype.querySelector;
-    const Document_querySelectorAll = Document.prototype.querySelectorAll;
-    const iframeConstructorAliasTest = new WindowConstructorAliasTest(
-        'window-constructors-alias-iframe',
-        '<pre>cdc_..._Array</pre>, <pre>cdc_..._Promise</pre> and <pre>cdc_..._Symbol</pre> vars on Window from an iframe'
-    );
     const executeScriptTest = new ExecuteScriptTest(
         window,
         'execute-script',
@@ -215,11 +247,19 @@ class ExecuteAsyncScriptTest extends JSCallStackTest {
         'execute-async-script',
         '<pre>driver.execute_async_script()</pre> usage'
     );
-    const tests = [
+    const passiveTests = [
         new WindowConstructorAliasTest(
             'window-constructors-alias',
             '<pre>cdc_..._Array</pre>, <pre>cdc_..._Promise</pre> and <pre>cdc_..._Symbol</pre> vars on Window'
-        ),
+        )
+    ];
+    const iframePassiveTests = [
+        new WindowConstructorAliasTest(
+            'window-constructors-alias-iframe',
+            '<pre>cdc_..._Array</pre>, <pre>cdc_..._Promise</pre> and <pre>cdc_..._Symbol</pre> vars on Window from an iframe'
+        )
+    ];
+    const activeTests = [
         new WindowDocumentAuxVarsTest(
             'window-document-aux-vars',
             '<pre>$cdc_..._</pre> and <pre>$chrome_asyncScriptInfo</pre> vars on document'
@@ -255,11 +295,13 @@ class ExecuteAsyncScriptTest extends JSCallStackTest {
             [/ apply\.css selector /]
         )
     ]
-
     window.addEventListener('DOMContentLoaded', function() {
         const iframe = document.createElement('iframe')
         iframe.style = 'display: none';
-        document.body.appendChild(iframe)
+        document.body.appendChild(iframe);
+        const detections = passiveTests.filter(thetest => thetest.test(window));
+        detections.push(...iframePassiveTests.filter(thetest => thetest.test(iframe.contentWindow)));
+        displayDetectionResult(detections, true);
         Document_querySelector.call(document, '#chromedriver-test').onclick = function() {
             const filledToken = Document_querySelector.call(document, '#chromedriver-token');
             const filledAsyncToken = Document_querySelector.call(document, '#chromedriver-asynctoken');
@@ -275,27 +317,8 @@ class ExecuteAsyncScriptTest extends JSCallStackTest {
                 status.textContent = 'Error!';
                 return;
             }
-            const detections = tests.filter(thetest => thetest.test(window));
-            if (iframeConstructorAliasTest.test(iframe.contentWindow)) detections.push(iframeConstructorAliasTest);
-            if (detections.length > 0) {
-                const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
-                status.textContent = 'Detected!';
-                status.classList.remove('test-status-passed');
-                status.classList.add('test-status-detected');
-                Document_querySelector.call(document, '#chromedriver-test-container .modal-content').innerHTML = detections.map(
-                    thetest => thetest.getDescriptionHTML()
-                ).join('');
-                const testResult = Document_querySelector.call(document, '#chromedriver-test-container .test-result');
-                testResult.textContent = `${detections.length} detections`;
-                testResult.onclick = function() {
-                    Document_querySelector.call(document, '#chromedriver-test-container .modal-container').classList.add('modal-visible');
-                }
-            } else {
-                const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
-                status.textContent = 'Passed!';
-                status.classList.remove('test-status-detected');
-                status.classList.add('test-status-passed');
-            }
+            detections.push(...activeTests.filter(thetest => thetest.test(window)));
+            displayDetectionResult(detections, false);
         }
         Document_querySelectorAll.call(document, '.modal-container').forEach(modal => {
             modal.onclick = function(event) {

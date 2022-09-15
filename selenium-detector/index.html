@@ -44,7 +44,7 @@
                 cursor: text;
             }
             .test-container {
-                width: 350px;
+                width: 380px;
             }
             .test-token-error {
                 border: 1px solid red;
@@ -60,6 +60,9 @@
             }
             .test-status-detected {
                 background-color: red;
+            }
+            .test-status-partially-passed {
+                background-color: rgb(0, 202, 0);
             }
             .test-status-passed {
                 background-color: green;
@@ -91,13 +94,18 @@
         <div id="chromedriver-test-container" class="test-container">
             <h2>Chromedriver Detector</h2>
             <span class="test-status">Waiting...</span>
-            <div>Fill the input fields below with the value of <pre>window.token</pre> variable and the value returned by the async function <pre>window.getAsyncToken()</pre> using <b>selenium automation</b>. Then click on "Test" button.</div>
+            <div>
+                For the interactions test fill the input fields below with the value of <pre>window.token</pre>
+                variable and the value returned by the async function <pre>window.getAsyncToken()</pre>
+                using <b>selenium automation</b>. Then click on "Interaction Test" button.
+                You can find example test script at <a href="https://github.com/HMaker/HMaker.github.io/blob/master/selenium-detector/test_uc.py" target="_blank">github</a>.
+            </div>
             <div id="chromedriver-test-input" class="test-input">
                 <label for="chromedriver-token">window.token</label>
                 <input type="text" id="chromedriver-token">
                 <label for="chromedriver-asynctoken">window.getAsyncToken()</label>
                 <input type="text" id="chromedriver-asynctoken">
-                <button id="chromedriver-test">Test</button>
+                <button id="chromedriver-test">Interaction Test</button>
                 <span class="test-result">0 detections</span>
             </div>
             <div class="modal-container">
