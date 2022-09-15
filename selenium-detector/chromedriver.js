@@ -231,28 +231,28 @@ class ExecuteAsyncScriptTest extends JSCallStackTest {
             '<pre>driver.find_element()</pre> usage',
             Document.prototype,
             'querySelector',
-            [/ apply\.css selector /, / callFunction /]
+            [/ apply\.css selector /]
         ),
         new JSHookTest(
             'find-elements',
             '<pre>driver.find_elements()</pre> usage',
             Document.prototype,
             'querySelectorAll',
-            [/ apply\.css selector /, / callFunction /]
+            [/ apply\.css selector /]
         ),
         new JSHookTest(
             'element-find-element',
             '<pre>element.find_element()</pre> usage',
             Element.prototype,
             'querySelector',
-            [/ apply\.css selector /, / callFunction /]
+            [/ apply\.css selector /]
         ),
         new JSHookTest(
             'element-find-elements',
             '<pre>element.find_elements()</pre> usage',
             Element.prototype,
             'querySelectorAll',
-            [/ apply\.css selector /, / callFunction /]
+            [/ apply\.css selector /]
         )
     ]
 
