@@ -338,12 +338,14 @@ function displayDetectionResult(detections, isPartial=false) {
                 filledToken.classList.add('test-token-error');
                 const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
                 status.textContent = 'Error!';
+                status.classList.add('test-status-detected');
                 return;
             }
             if (filledAsyncToken.value != executeAsyncScriptTest.token) {
                 filledAsyncToken.classList.add('test-token-error');
                 const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
                 status.textContent = 'Error!';
+                status.classList.add('test-status-detected');
                 return;
             }
             detections.push(...activeTests.filter(thetest => thetest.test(window)));
