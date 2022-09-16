@@ -338,6 +338,8 @@ function displayDetectionResult(detections, isPartial=false) {
                 filledToken.classList.add('test-token-error');
                 const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
                 status.textContent = 'Error!';
+                status.classList.remove('test-status-partially-passed');
+                status.classList.remove('test-status-passed');
                 status.classList.add('test-status-detected');
                 return;
             }
@@ -345,6 +347,8 @@ function displayDetectionResult(detections, isPartial=false) {
                 filledAsyncToken.classList.add('test-token-error');
                 const status = Document_querySelector.call(document, '#chromedriver-test-container .test-status');
                 status.textContent = 'Error!';
+                status.classList.remove('test-status-partially-passed');
+                status.classList.remove('test-status-passed');
                 status.classList.add('test-status-detected');
                 return;
             }
