@@ -27,6 +27,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+'use strict';
 
 const Document_querySelector = Document.prototype.querySelector;
 const Document_querySelectorAll = Document.prototype.querySelectorAll;
@@ -152,18 +153,20 @@ class WindowDocumentAuxVarsTest extends SeleniumDetectionTest {
 class CDPRuntimeDomainTest extends SeleniumDetectionTest {
 
     test(window) {
-        let trapped = false;
-        const e = new Error();
+        let stackLookup = false;
+        const e = new window.Error();
+        // there might be several ways to catch property access from console print functions
         window.Object.defineProperty(e, 'stack', {
             configurable: false,
             enumerable: false,
             get: function() {
-                trapped = true;
+                stackLookup = true;
                 return '';
             }
         });
+        // can be bypassed by patching all console print functions
         window.console.debug(e);
-        return trapped;
+        return stackLookup;
     }
 
 }
