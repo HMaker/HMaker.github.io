@@ -7,6 +7,8 @@ Clone this repository, install the requirements and run the test with `python te
 | UC version | Detected? |
 | --- | --- |
 | 3.4.6 [bf7dcf8](https://github.com/ultrafunkamsterdam/undetected-chromedriver/commit/bf7dcf8b5713020de7454844fb80036b8c456503) | **Yes** |
+| 3.4.7 [d29b3e3](https://github.com/ultrafunkamsterdam/undetected-chromedriver/commit/d29b3e300fe75aa878e0313bce37a1816d6bd4c0) | **Yes** |
+| 3.5.0 [bc1445a](https://github.com/ultrafunkamsterdam/undetected-chromedriver/commit/bc1445aac720eda300ffba70e26bbf95eef4b6d1) | **Yes** |
 
 
 [1]: https://chromedriver.chromium.org/home

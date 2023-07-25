@@ -1,6 +1,7 @@
 import argparse
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 parser = argparse.ArgumentParser(description='Test undetected-chromedriver against the Chromedriver Detector')
@@ -8,7 +9,10 @@ parser.add_argument('--tester', default='http://127.0.0.1:5500/index.html', help
 parser.add_argument('--chrome-version', type=int, default=None, help='major version of chrome (eg 110)')
 args = parser.parse_args()
 
-chrome = uc.Chrome(version_main=args.chrome_version)
+options = uc.ChromeOptions()
+caps = DesiredCapabilities.CHROME.copy()
+caps['loggingPrefs'] = {'browser': 'OFF'}
+chrome = uc.Chrome(version_main=args.chrome_version, desired_capabilities=caps)
 try:
     chrome.get(args.tester)
     chrome.find_element(By.CSS_SELECTOR, '#chromedriver-token').send_keys(
